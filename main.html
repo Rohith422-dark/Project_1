@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .profile-dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .profile-dropdown.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 15px 15px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 15px 15px;
+            color: #e74c3c;
+        }
+
+        .dropdown-item:last-child:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        /* AI Agent Button */
+        .ai-agent-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            animation: aiPulse 2s infinite;
+        }
+
+        .ai-agent-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .ai-agent-btn span {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        @keyframes aiPulse {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4), 0 0 0 10px rgba(102, 126, 234, 0.1);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            height: calc(100vh - 120px);
+        }
+
+        /* AI Chat Section */
+        .chat-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+
+        .user-message {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            background: rgba(102, 126, 234, 0.1);
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .ai-message.special {
+            background: linear-gradient(45deg, rgba(76, 175, 80, 0.1), rgba(139, 195, 74, 0.1));
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.02);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Folders Section */
+        .folders-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .folders-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .folder {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .folder.ai-agent {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(139, 195, 74, 0.15));
+            border-color: rgba(76, 175, 80, 0.4);
+            animation: aiGlow 3s infinite;
+        }
+
+        @keyframes aiGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            }
+        }
+
+        .folder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .folder:hover::before {
+            left: 100%;
+        }
+
+        .folder:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .folder.ai-agent:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.25), rgba(139, 195, 74, 0.25));
+        }
+
+        .folder-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .folder-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .ai-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #4ade80;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            padding: 0.75rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+            max-width: 80px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            40% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .navbar-left {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1rem;
+                height: auto;
+            }
+
+            .chat-section {
+                height: 400px;
+            }
+
+            .folders-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .ai-agent-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .ai-agent-btn span {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .company-name {
+                font-size: 1.2rem;
+            }
+
+            .folders-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="company-name">TechCorp Inc.</div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search anything...">
+            </div>
+        </div>
+        <div class="navbar-right">
+            <a href="#" class="nav-item">Theme</a>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-btn" onclick="toggleProfileDropdown()">
+                    👤 Profile
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" onclick="openSettings()">
+                        ⚙️ Settings
+                    </div>
+                    <div class="dropdown-item" onclick="openAccount()">
+                        👤 Account
+                    </div>
+                    <div class="dropdown-item" onclick="openNotifications()">
+                        🔔 Notifications
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="logout()">
+                        🚪 Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating AI Agent Button -->
+    <div class="ai-agent-btn" onclick="activateAIAgent()" title="AI Agent Assistant">
+        <span>🤖</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- AI Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                🤖 AI Assistant
+                <div class="ai-status">
+                    <div class="status-dot"></div>
+                    <span>AI Agent Active</span>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message special">
+                    🚀 AI Agent System Activated! I'm your enhanced AI assistant with advanced capabilities. I can help with project management, data analysis, document processing, and much more. Try asking me about AI Agent features!
+                </div>
+                <div class="message user-message">
+                    Can you help me with project management?
+                </div>
+                <div class="message ai-message">
+                    Absolutely! With AI Agent capabilities, I can help you with advanced project management including automated task scheduling, predictive analytics, resource optimization, and intelligent team coordination. What specific aspect would you like to focus on?
+                </div>
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Ask AI Agent anything..." id="chatInput">
+                <button class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Folders Section -->
+        <div class="folders-section">
+            <div class="folders-header">📁 Document Folders & AI Tools</div>
+            <div class="folders-grid">
+                <div class="folder ai-agent" onclick="openFolder('AI Agent')">
+                    <span class="folder-icon">🤖</span>
+                    <div class="folder-name">AI Agent Hub</div>
+                    <div class="ai-badge">AI</div>
+                </div>
+                <div class="folder" onclick="openFolder('projects')">
+                    <span class="folder-icon">📂</span>
+                    <div class="folder-name">Projects</div>
+                </div>
+                <div class="folder" onclick="openFolder('reports')">
+                    <span class="folder-icon">📊</span>
+                    <div class="folder-name">Reports</div>
+                </div>
+                <div class="folder" onclick="openFolder('documents')">
+                    <span class="folder-icon">📄</span>
+                    <div class="folder-name">Documents</div>
+                </div>
+                <div class="folder" onclick="openFolder('Leaderboard')">
+                    <span class="folder-icon">📈</span>
+                    <div class="folder-name">Leaderboard</div>
+                </div>
+                <div class="folder" onclick="openFolder('Integrated Services')">
+                    <span class="folder-icon">📝</span>
+                    <div class="folder-name">Integrated Services</div>
+                </div>
+                <div class="folder" onclick="openFolder('Version Control')">
+                    <span class="folder-icon">🔄</span>
+                    <div class="folder-name">Version Control</div>
+                </div>
+                <div class="folder" onclick="openFolder('Chat Log')">
+                    <span class="folder-icon">💬</span>
+                    <div class="folder-name">Chat Log</div>
+                </div>
+                <div class="folder" onclick="openFolder('presentations')">
+                    <span class="folder-icon">📽</span>
+                    <div class="folder-name">Presentations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced AI Agent functionality
+        let aiAgentActive = true;
+        let aiPersonality = 'helpful';
+
+        // Profile dropdown functionality
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Profile dropdown actions
+        function openSettings() {
+            alert('⚙️ Opening Settings...\n\n• Theme Preferences\n• Notification Settings\n• Privacy Controls\n• AI Agent Configuration\n• Language Settings');
+            document.getElementById('profileDropdown').classList.remove('active');
+        }
+
+        function openAccount() {
+            alert('👤 Opening Account Settings...\n\n• Profile Information\n• Security Settings\n• Password Management\n• Two-Factor Authentication\n• Account Preferences');
+            document.getElementById('profileDropdown').classList.remove('active');
+        }
+
+        function openNotifications() {
+            alert('🔔 Notification Center\n\n• 3 New Messages\n• 2 System Updates\n• 1 AI Agent Report\n• Project Deadline Reminder');
+            document.getElementById('profileDropdown').classList.remove('active');
+        }
+
+        function logout() {
+            if (confirm('🚪 Are you sure you want to logout?')) {
+                alert('Logging out... Goodbye!');
+                // In a real app, you would redirect to login page
+                // window.location.href = 'login.html';
+            }
+            document.getElementById('profileDropdown').classList.remove('active');
+        }
+
+        // Chat functionality with AI Agent enhancements
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            if (input.value.trim() === '') return;
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.textContent = input.value;
+            messagesContainer.appendChild(userMessage);
+            
+            // Store user input and clear
+            const userText = input.value;
+            input.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Simulate AI Agent response with longer delay for "thinking"
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai-message';
+                
+                // Check if it's an AI Agent specific query
+                if (userText.toLowerCase().includes('ai agent') || userText.toLowerCase().includes('ai')) {
+                    aiMessage.classList.add('special');
+                }
+                
+                aiMessage.textContent = getAIAgentResponse(userText);
+                messagesContainer.appendChild(aiMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 2000);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Enhanced AI Agent responses
+        function getAIAgentResponse(userInput) {
+            const input = userInput.toLowerCase();
+            
+            if (input.includes('ai agent')) {
+                const agentResponses = [
+                    "🚀 AI Agent here! I have enhanced capabilities including predictive analytics, automated workflows, intelligent document processing, and real-time data insights. What would you like me to help you with?",
+                    "✨ As your AI Agent, I can perform complex analysis, automate repetitive tasks, provide intelligent recommendations, and integrate with all your corporate systems. How can I assist you today?",
+                    "🧠 AI Agent activated! I can help with advanced project management, data visualization, automated reporting, and intelligent decision support. What's your priority task?",
+                    "🤖 AI Agent ready for action! I specialize in workflow optimization, predictive modeling, intelligent automation, and comprehensive business intelligence. What challenge shall we tackle?"
+                ];
+                return agentResponses[Math.floor(Math.random() * agentResponses.length)];
+            } else if (input.includes('project') || input.includes('management')) {
+                return "🎯 With AI Agent capabilities, I can provide advanced project management including automated task scheduling, resource optimization, risk prediction, timeline forecasting, and intelligent team coordination. I can also generate detailed reports and suggest improvements based on historical data patterns.";
+            } else if (input.includes('data') || input.includes('analysis')) {
+                return "📊 My AI Agent data analysis features include real-time dashboard creation, predictive modeling, trend analysis, anomaly detection, and automated insights generation. I can process large datasets and provide actionable business intelligence recommendations.";
+            } else if (input.includes('automate') || input.includes('workflow')) {
+                return "⚙️ AI Agent automation services include workflow optimization, task automation, intelligent routing, process mining, and efficiency recommendations. I can identify bottlenecks and suggest automated solutions to streamline your operations.";
+            } else if (input.includes('help') || input.includes('what can you do')) {
+                return "🌟 As your AI Agent, I offer: Advanced Analytics 📊, Process Automation ⚙️, Intelligent Document Processing 📄, Predictive Modeling 🔮, Real-time Insights ⚡, Workflow Optimization 🎯, and Comprehensive Reporting 📈. What would you like to explore?";
+            } else {
+                const enhancedResponses = [
+                    "🤖 AI Agent processing your request... I can provide detailed analysis and intelligent recommendations for this topic.",
+                    "✨ Using AI Agent capabilities to understand your needs better. Let me provide you with enhanced insights.",
+                    "🧠 AI Agent activated! I'm analyzing multiple data points to give you the most comprehensive response.",
+                    "🚀 Leveraging advanced AI Agent algorithms to process your query and provide optimal solutions.",
+                    "⚡ AI Agent working on your request with enhanced pattern recognition and intelligent processing.",
+                    "🎯 My AI Agent systems are analyzing your input to provide data-driven recommendations and insights."
+                ];
+                return enhancedResponses[Math.floor(Math.random() * enhancedResponses.length)];
+            }
+        }
+
+        // Floating AI Agent activation
+        function activateAIAgent() {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add special AI Agent message
+            const agentMessage = document.createElement('div');
+            agentMessage.className = 'message ai-message special';
+            agentMessage.textContent = "🚀 AI Agent Enhanced Mode Activated! I now have access to advanced analytics, automation tools, and intelligent processing capabilities. Ask me anything!";
+            messagesContainer.appendChild(agentMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Visual feedback
+            const btn = document.querySelector('.ai-agent-btn');
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        // Handle Enter key in chat input
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Enhanced folder functionality with AI Agent
+        function openFolder(folderName) {
+            if (folderName === 'AI Agent') {
+                // Navigate to AI Agent hub or show special interface
+                alert('🤖 Opening AI Agent Hub...\n\nFeatures:\n• Advanced Analytics Dashboard\n• Automation Tools\n• Intelligent Workflows\n• Predictive Models\n• Real-time Insights\n• Process Optimization');
+                // You can create an aiagent.html file for this
+                // window.location.href = 'aiagent.html';
+            } else if (folderName === 'Leaderboard') {
+                window.location.href = 'leaderboard.html';
+            } else if (folderName === 'documents') {
+                window.location.href = 'document.html';
+            } else if (folderName === 'presentations') {
+                window.location.href = 'presentations.html';
+            } else if (folderName === 'Integrated Services') {
+                window.location.href = 'services.html';
+            } else if (folderName === 'Chat Log') {
+                window.location.href = 'chatlog.html';
+            } else if (folderName === 'Version Control') {
+                window.location.href = 'version.html';
+            } else if (folderName === 'projects') {
+                window.location.href = 'projects.html';
+            } else if (folderName === 'reports') {
+                window.location.href = 'report.html';
+            } else {
+                alert(`Opening ${folderName} folder...`);
+            }
+        }
+
+        // Enhanced search with AI Agent
+        document.querySelector('.search-bar').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value;
+                if (searchTerm.toLowerCase().includes('ai') || searchTerm.toLowerCase().includes('agent')) {
+                    alert(`🤖 AI Agent Search Results for: "${searchTerm}"\n\nFound: AI Agent Hub, Enhanced Analytics, Automation Tools, Intelligent Workflows`);
+                } else {
+                    alert(`🔍 AI Agent Enhanced Search for: "${searchTerm}"\n\nSearching across all systems with intelligent filtering...`);
+                }
+            }
+        });
+
+        // Add some dynamic effects with AI Agent enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate folders on load
+            const folders = document.querySelectorAll('.folder');
+            folders.forEach((folder, index) => {
+                folder.style.animation = `slideIn 0.3s ease ${index * 0.1}s both`;
+            });
+
+            // Add periodic AI Agent status updates
+            setInterval(() => {
+                if (Math.random() > 0.95) {
+                    const statusMessages = [
+                        "🤖 AI Agent: Monitoring system performance...",
+                        "⚡ AI Agent: Optimizing workflows in background...",
+                        "📊 AI Agent: Analyzing data patterns...",
+                        "🔍 AI Agent: Scanning for process improvements..."
+                    ];
+                    
+                    // You could add these as subtle notifications if desired
+                    console.log(statusMessages[Math.floor(Math.random() * statusMessages.length)]);
+                }
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
